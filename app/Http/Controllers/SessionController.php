@@ -28,9 +28,16 @@ class SessionController extends Controller
 
       if (Auth::attempt($cre, $request->has('remember'))) {
         //echo "yes";
-        session()->flash('success','欢迎回来');
-        // return redirect()->route('users.show',[Auth::user()]);
-        return redirect()->intended(route('users.show',[Auth::user()]));
+        if (Auth::user()->activated) {
+          session()->flash('success','欢迎回来');
+          // return redirect()->route('users.show',[Auth::user()]);
+          return redirect()->intended(route('users.show',[Auth::user()]));
+        } else {
+          Auth::logout();
+          session()->flash('warning', '你的账号未激活，请检查邮箱中的注册邮件进行激活');
+          return redirect('/');
+        }
+
       } else {
         //echo "no";
         session()->flash('danger', '很抱歉，你的邮箱和密码不匹配');

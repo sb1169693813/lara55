@@ -6,13 +6,14 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Requests;
 use Auth;
+use Mail;
 
 class UserController extends Controller
 {
     public function __construct()
     {
       $this->middleware('auth', [
-        'except' => ['show', 'create', 'store', 'index'],
+        'except' => ['show', 'create', 'store', 'index', 'comfirmEmail'],
       ]);
       $this->middleware('guest', [
         'only' => ['create']
@@ -35,6 +36,9 @@ class UserController extends Controller
       return view('users.show', ['user' => $user]);
     }
 
+  /**
+   * 注册动作
+   */
     public function store(Request $request)
     {
       $this->validate($request, [
@@ -48,10 +52,48 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password)
         ]);
-        Auth::login($user);
-      session()->flash('success', '欢迎，您将在这里开启一段新的旅程');
-      return redirect()->route('users.show', ['user' => $user]);
+
+      //Auth::login($user);
+      $this->sendEmailConfirmationTo($user);
+
+      // session()->flash('success', '欢迎，您将在这里开启一段新的旅程');
+      // return redirect()->route('users.show', ['user' => $user]);
+      session()->flash('success', '验证邮件已发送到你的注册邮箱中，请注意查收');
+      return redirect()->route('users.show',['user' => $user]);
     }
+
+    /**
+    * 发送邮件
+    */
+    public function sendEmailConfirmationTo($user)
+    {
+      $view = "emails.confirm";
+      $data = compact('user');
+      $from = '446352377@qq.com';
+      $name = "sunbin";
+      $to = $user->email;
+      $subject = '感谢注册lara55应用！请确认您的邮箱';
+
+      Mail::send($view, $data, function ($message) use ($from, $name, $to, $subject) {
+        $message->from($from, $name)->to($to)->subject($subject);
+      });
+    }
+
+    /**
+     * 验证邮箱
+     */
+     public function comfirmEmail($token)
+     {
+       $user = User::where('activation_token',$token)->firstOrFali();
+       $user->activated = true;
+       $user->activation_token = null;
+       $user->save();
+
+       Auth::login($user);
+
+       session()->flash('success', '恭喜您，激活成功');
+       return redirect()->route('users.show',['user' => $user]);
+     }
 
     public function edit(User $user)
     {
