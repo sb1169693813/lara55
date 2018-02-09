@@ -26,19 +26,31 @@ class UserController extends Controller
       return view('users.index', ['users' => $users]);
     }
 
+    /**
+     * 注册页面
+     */
     public function create()
     {
       return view('users.create');
     }
 
+    /**
+     * 个人页面
+     */
     public function show(User $user)
     {
-      return view('users.show', ['user' => $user]);
+      $userStatuses = $user->statuses()
+                           ->orderBy('created_at', 'desc')
+                           ->paginate(5);
+      return view('users.show', [
+        'user' => $user,
+        'userStatuses' => $userStatuses
+        ]);
     }
 
-  /**
-   * 注册动作
-   */
+    /**
+     * 注册动作
+     */
     public function store(Request $request)
     {
       $this->validate($request, [

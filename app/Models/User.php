@@ -49,4 +49,12 @@ class User extends Authenticatable
     {
         $this->notify(new ResetPassword($token));
     }
+
+    /**
+     * 一个用户拥有多个微博 
+     */
+    public function statuses()
+    {
+        return $this->hasMany('App\Models\Status');
+    }
 }
