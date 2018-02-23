@@ -30,5 +30,6 @@ Route::get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm'
 Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
 Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
 Route::post('password/reset', 'Auth\ResetPasswordController@reset')->name('password.update');
-
+//我们完成微博的创建和删除只需要两个动作，因此我们可以对 resource 传参 only 键指定只生成某几个动作的路由。
+Route::resource('statuses', 'StatusesController', ['only' => ['store', 'destroy']]);
 

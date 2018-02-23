@@ -22,7 +22,7 @@ class Status extends Model
 	 */
     public function user()
     {
-    	return $this->belongs('App\Models\User');
+    	return $this->belongsTo('App\Models\User');
     }
 
 }
