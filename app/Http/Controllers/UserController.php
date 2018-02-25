@@ -139,4 +139,25 @@ class UserController extends Controller
       session()->flash('success', '删除用户成功');
       return redirect()->back();
     }
+    //关注的人
+    public function followings(User $user)
+    {
+      $users = $user->followings()->paginate(5);
+      $title = '关注的人';
+      return view('users.show_follow',[
+        'users' => $users,
+        'title' => $title
+      ]);
+    }
+
+      // 粉丝
+    public function followers(User $user)
+    {
+      $users = $user->followers()->paginate(5);
+      $title = '粉丝';
+      return view('users.show_follow',[
+        'users' => $users,
+        'title' => $title
+      ]);
+    }
 }
